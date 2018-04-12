@@ -15,7 +15,7 @@
   shell: git show -s --format=%ct
   args:
     chdir: "{{ blue_green[item.key].directory }}"
-  with_dict: blue_green
+  with_dict: "{{ blue_green }}"
   changed_when: false
   register: color_dates
   ignore_errors: yes
@@ -26,18 +26,18 @@
 
 - name: Set color
   set_fact: blue_green_color={{color_dates.results[1].item.key}}
-  when: "color_dates|success and (color_dates['results'][0]['stdout'] > color_dates['results'][1]['stdout'])"
+  when: "color_dates is success and (color_dates['results'][0]['stdout'] > color_dates['results'][1]['stdout'])"
 
 # Lower than or equal operator makes sure blue or green wins is both directories
 # contains the exact same version (e.g., after bootstrapping empty directories)
 - name: Set color
   set_fact: blue_green_color={{color_dates.results[0].item.key}}
-  when: "color_dates|success and (color_dates['results'][0]['stdout'] <= color_dates['results'][1]['stdout'])"
+  when: "color_dates is success and (color_dates['results'][0]['stdout'] <= color_dates['results'][1]['stdout'])"
 
 
 - name: Override to set deploy to failed color (bootstrapping case)
   set_fact: blue_green_color={{ item.item.key }}
-  when: item | failed
+  when: item is failed
   with_items: color_dates['results']
 
 - name: Debugs color
