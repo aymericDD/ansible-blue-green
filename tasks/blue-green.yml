@@ -5,7 +5,7 @@
 - name: Checks that directories variable contains proper colors
   fail: msg="'blue_green directory' application path for {{ item.key }} is not set. Please, see README.md."
   when: blue_green[item.key].directory is not defined
-  with_dict: blue_green
+  with_dict: "{{ blue_green }}"
 
 - name: Show blue_green_directories variables
   debug: var=blue_green
